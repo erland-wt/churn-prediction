@@ -8,6 +8,7 @@ import logging
 import os
 from pydantic import BaseModel, Field, conint, confloat
 import numpy as np
+from fastapi.middleware.cors import CORSMiddleware
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -187,6 +188,14 @@ def preprocess_raw_record(rec: dict) -> pd.DataFrame:
 
     return df
 
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
 # ---------- Endpoints ----------
 @app.get("/")
 def root():
@@ -243,4 +252,3 @@ def predict_raw(payload: RawCustomer = Body(...)):
     except Exception as e:
         logger.exception("Error predict_raw: %s", e)
         raise HTTPException(status_code=500, detail=str(e))
-
